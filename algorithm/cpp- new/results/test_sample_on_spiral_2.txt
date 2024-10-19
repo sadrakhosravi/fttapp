@@ -1,0 +1,12 @@
+Test Parameters:
+r1: 3
+r2: 1
+h: 1.2
+cut_angle: 1.0472
+theta: 0.785398
+equidistant: false
+
+Outputs:
+ch: 1.2
+cr: 1
+Result Vector: (0.707107, 1.2, 0.707107)

@@ -1,0 +1,3 @@
+C:/Users/sadra/dev/fttapp/algorithm/cpp/cmake-build-debug/CMakeFiles/CylinderApp.dir
+C:/Users/sadra/dev/fttapp/algorithm/cpp/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/sadra/dev/fttapp/algorithm/cpp/cmake-build-debug/CMakeFiles/rebuild_cache.dir

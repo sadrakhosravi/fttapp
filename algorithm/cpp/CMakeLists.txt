@@ -7,17 +7,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Specify the path to vcpkg toolchain file if not passed via command line
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-    set(CMAKE_TOOLCHAIN_FILE "C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+    set(CMAKE_TOOLCHAIN_FILE "C:/Users/sadra/dev/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
 endif()
 
 # Find OpenGL
 find_package(OpenGL REQUIRED)
 
-# Find Eigen3
-find_package(Eigen3 CONFIG REQUIRED)
+# Set the absolute path for Eigen3
+set(EIGEN3_INCLUDE_DIR "C:/Users/sadra/dev/vcpkg/packages/eigen3_x64-windows/include/eigen3")
+set(LIBIGL_INCLUDE_DIR "C:/Users/sadra/dev/vcpkg/packages/libigl_x64-windows/include")
 
-# Find libigl
-find_package(libigl CONFIG REQUIRED)
+# Add include directories
+include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(${LIBIGL_INCLUDE_DIR})
 
 # Find GLFW
 find_package(glfw3 CONFIG REQUIRED)

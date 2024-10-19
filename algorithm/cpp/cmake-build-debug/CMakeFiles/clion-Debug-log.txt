@@ -1,0 +1,15 @@
+"C:\Program Files\JetBrains\CLion 2024.2.2\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2024.2.2/bin/ninja/win/x64/ninja.exe" -G Ninja -S C:\Users\sadra\dev\fttapp\algorithm\cpp -B C:\Users\sadra\dev\fttapp\algorithm\cpp\cmake-build-debug
+CMake Error at CMakeLists.txt:25 (find_package):
+  Could not find a package configuration file provided by "libigl" with any
+  of the following names:
+
+    libiglConfig.cmake
+    libigl-config.cmake
+
+  Add the installation prefix of "libigl" to CMAKE_PREFIX_PATH or set
+  "libigl_DIR" to a directory containing one of the above files.  If "libigl"
+  provides a separate development package or SDK, be sure it has been
+  installed.
+
+
+-- Configuring incomplete, errors occurred!
