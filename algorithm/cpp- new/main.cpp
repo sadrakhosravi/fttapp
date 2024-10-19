@@ -177,7 +177,6 @@ void test_SampleOnSpiral(const std::string& file_path, TestParams& params)
         std::filesystem::create_directories(dir);
     }
 
-
     // Save results to a file
     std::ofstream outfile(file_path);
     if (!outfile.is_open())
@@ -204,8 +203,7 @@ void test_SampleOnSpiral(const std::string& file_path, TestParams& params)
     std::cout << "Test results saved to " << file_path << std::endl;
 }
 
-// Main function for testing the app
-int main(int argc, char* argv[])
+void run_test_on_spiral()
 {
     TestParams params = {
         r1 = 1.0,
@@ -248,6 +246,187 @@ int main(int argc, char* argv[])
     };
     const std::string file_path3 = "../results/test_sample_on_spiral_3.txt"; // Specify the relative path
     test_SampleOnSpiral(file_path3, params3);
+}
+
+void test_CreateCylinderWithCut(const std::string& file_path, const TestParams& params)
+{
+    // Output matrices and vectors
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> V; // Vertices
+    Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> F; // Faces
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> P; // Points
+    std::vector<int> edges, corrs;
+
+    // Call the function to create the cylinder with cut
+    CreateCylinderWithCut(params.r1, params.r2, params.h, V, F, P, static_cast<int>(params.cir_res), params.cut_angle,
+                          params.equidistant,
+                          edges, corrs);
+
+    // Ensure that the directory exists (C++17 feature)
+    std::filesystem::path dir = file_path.substr(0, file_path.find_last_of('/'));
+    if (!std::filesystem::exists(dir))
+    {
+        std::filesystem::create_directories(dir);
+    }
+
+    // Save the results to the file
+    std::ofstream outfile(file_path);
+    if (!outfile.is_open())
+    {
+        std::cerr << "Error: Could not open file " << file_path << " for writing." << std::endl;
+        return;
+    }
+
+    // Write parameters
+    outfile << "Test Parameters:" << std::endl;
+    outfile << "r1: " << params.r1 << std::endl;
+    outfile << "r2: " << params.r2 << std::endl;
+    outfile << "h: " << params.h << std::endl;
+    outfile << "circle_res: " << params.cir_res << std::endl;
+    outfile << "cut_angle: " << params.cut_angle << std::endl;
+    outfile << "theta: " << params.theta << std::endl;
+    outfile << "ch: " << params.ch << std::endl;
+    outfile << "cr: " << params.cr << std::endl;
+    outfile << "equidistant: " << (params.equidistant ? "true" : "false") << std::endl;
+    outfile << std::endl;
+
+    // Write vertices (V)
+    outfile << "Vertices (V):" << std::endl;
+    for (int i = 0; i < V.rows(); ++i)
+    {
+        outfile << V(i, 0) << " " << V(i, 1) << " " << V(i, 2) << std::endl;
+    }
+    outfile << std::endl;
+
+    // Write faces (F)
+    outfile << "Faces (F):" << std::endl;
+    for (int i = 0; i < F.rows(); ++i)
+    {
+        outfile << F(i, 0) << " " << F(i, 1) << " " << F(i, 2) << std::endl;
+    }
+    outfile << std::endl;
+
+    // Write points (P)
+    outfile << "Points (P):" << std::endl;
+    for (int i = 0; i < P.rows(); ++i)
+    {
+        outfile << P(i, 0) << " " << P(i, 1) << " " << P(i, 2) << std::endl;
+    }
+    outfile << std::endl;
+
+    // Write edges
+    outfile << "Edges:" << std::endl;
+    for (size_t i = 0; i < edges.size(); i += 2)
+    {
+        outfile << edges[i] << " " << edges[i + 1] << std::endl;
+    }
+    outfile << std::endl;
+
+    outfile.close();
+    std::cout << "Test results saved to " << file_path << std::endl;
+}
+
+void run_test_create_cylinder()
+{
+    // Define multiple test cases
+    constexpr TestParams params1 = {1.0, 0.8, 2.0, 100, M_PI / 4, 0.0, 0.0, 0.0, true};
+    const std::string file_path1 = "../results/test_CreateCylinderWithCut_1.txt";
+    test_CreateCylinderWithCut(file_path1, params1);
+
+    constexpr TestParams params2 = {2.0, 1.5, 3.0, 150, M_PI / 6, 0.0, 0.0, 0.0, false};
+    const std::string file_path2 = "../results/test_CreateCylinderWithCut_2.txt";
+    test_CreateCylinderWithCut(file_path2, params2);
+
+    constexpr TestParams params3 = {1.5, 1.2, 2.5, 120, M_PI / 3, 0.0, 0.0, 0.0, true};
+    const std::string file_path3 = "../results/test_CreateCylinderWithCut_3.txt";
+    test_CreateCylinderWithCut(file_path3, params3);
+}
+
+// Test function to call CreateCylinderWithCut, then UnwarpCylinder, and save the results to a file
+void test_UnwarpCylinder(const std::string& file_path, const TestParams& params)
+{
+    // Output matrices and vectors for CreateCylinderWithCut
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> V; // Vertices
+    Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> F; // Faces
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> P; // Points
+    std::vector<int> edges, corrs;
+
+    // Call CreateCylinderWithCut to generate vertices and faces
+    CreateCylinderWithCut(params.r1, params.r2, params.h, V, F, P, params.cir_res, params.cut_angle, params.equidistant,
+                          edges, corrs);
+
+    // Output matrix for the unwrapped cylinder vertices
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Vuv;
+
+    // Call UnwarpCylinder function using the results of CreateCylinderWithCut
+    UnwarpCylinder(V, F, Vuv);
+
+    // Ensure that the directory exists
+    std::filesystem::path dir = file_path.substr(0, file_path.find_last_of('/'));
+    if (!std::filesystem::exists(dir))
+    {
+        std::filesystem::create_directories(dir);
+    }
+
+    // Save the results to the file
+    std::ofstream outfile(file_path);
+    if (!outfile.is_open())
+    {
+        std::cerr << "Error: Could not open file " << file_path << " for writing." << std::endl;
+        return;
+    }
+
+    // Write the original vertices (V)
+    outfile << "Original Vertices (V):" << std::endl;
+    for (int i = 0; i < V.rows(); ++i)
+    {
+        outfile << V(i, 0) << " " << V(i, 1) << " " << V(i, 2) << std::endl;
+    }
+    outfile << std::endl;
+
+    // Write the faces (F)
+    outfile << "Faces (F):" << std::endl;
+    for (int i = 0; i < F.rows(); ++i)
+    {
+        outfile << F(i, 0) << " " << F(i, 1) << " " << F(i, 2) << std::endl;
+    }
+    outfile << std::endl;
+
+    // Write the unwrapped vertices (Vuv)
+    outfile << "Unwrapped Vertices (Vuv):" << std::endl;
+    for (int i = 0; i < Vuv.rows(); ++i)
+    {
+        outfile << Vuv(i, 0) << " " << Vuv(i, 1) << " " << Vuv(i, 2) << std::endl;
+    }
+    outfile << std::endl;
+
+    outfile.close();
+    std::cout << "Test results saved to " << file_path << std::endl;
+}
+
+
+void run_test_unwrap_cylinder()
+{
+    // Define multiple test cases
+    constexpr TestParams params1 = {1.0, 0.8, 2.0, 100, M_PI / 4, 0.0, 0.0, 0.0, true};
+    const std::string file_path1 = "../results/test_UnwrapCylinder_1.txt";
+    test_UnwarpCylinder(file_path1, params1);
+
+    constexpr TestParams params2 = {2.0, 1.5, 3.0, 150, M_PI / 6, 0.0, 0.0, 0.0, false};
+    const std::string file_path2 = "../results/test_UnwrapCylinder_2.txt";
+    test_UnwarpCylinder(file_path2, params2);
+
+    constexpr TestParams params3 = {1.5, 1.2, 2.5, 120, M_PI / 3, 0.0, 0.0, 0.0, true};
+    const std::string file_path3 = "../results/test_UnwrapCylinder_3.txt";
+    test_UnwarpCylinder(file_path3, params3);
+}
+
+
+// Main function for testing the app
+int main(int argc, char* argv[])
+{
+    run_test_on_spiral();
+    run_test_create_cylinder();
+    run_test_unwrap_cylinder();
 }
 
 
