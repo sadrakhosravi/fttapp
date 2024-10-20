@@ -422,91 +422,89 @@ void run_test_unwrap_cylinder()
 
 
 // Main function for testing the app
-int main(int argc, char* argv[])
-{
-    run_test_on_spiral();
-    run_test_create_cylinder();
-    run_test_unwrap_cylinder();
-}
+// int main(int argc, char* argv[])
+// {
+//     run_test_on_spiral();
+//     run_test_create_cylinder();
+//     run_test_unwrap_cylinder();
+// }
 
 
 // Main App
-// int main(int argc, char *argv[])
-// {
-//     std::string outfile = "test.ps";
-//     if (argc<6)
-//     {
-//         std::cout<<"Use: "<<argv[0]<<" circumference1 curcumference2 height cut_angle outputfile "<<std::endl;
-//         std::cout<<"     -equidistant -- test this flag"<<std::endl;
-//         std::cout<<"     NOTE: all units are centimeters, cut angle is in degrees"<<std::endl;
-//     }
-//     else
-//     {
-//         r1 = atof(argv[1])/(2*M_PI);
-//         r2 = atof(argv[2])/(2*M_PI);
-//         h = atof(argv[3]);
-//         cut_angle = atof(argv[4])/180*M_PI;
-//         outfile = argv[5];
-//
-//         for (int i=6; i<argc; i++)
-//         {
-//             if (strcmp(argv[i], "-equidistant"))
-//                 equidistant = true;
-//             else
-//                 std::cout<<"[WARNING] Unknown command: "<<argv[i]<<std::endl;
-//         }
-//     }
-//     std::vector<int> edges, corrs;
-//
-//     CreateCylinderWithCut(r1, r2, h, V, F, P, cir_res, cut_angle, equidistant, edges, corrs);
-//     UnwarpCylinder(V,F,Vuv);
-//
-//     int width = 595; //210;
-//     int height = 842; //297;
-//     double cm2pxw = 10 * width / 210.;
-//     double cm2pxh = 10 * height / 297.;
-//     double minx = Vuv.col(0).minCoeff();
-//     double maxx = Vuv.col(0).maxCoeff();
-//     double miny = Vuv.col(1).minCoeff();
-//     double maxy = Vuv.col(1).maxCoeff();
-//
-//     if (maxx-minx>=width || maxy-miny>=height)
-//     {
-//         std::cout<<"[ERROR] Cannot fit "<<(maxx-minx)<<"x"<<(maxy-miny)<<" cutout ";
-//         std::cout<<" on "<<width<<"x"<<height<<" paper "<<std::endl;
-//     }
-//     else
-//     {
-//
-//         std::ofstream textStream(outfile.c_str());
-//         textStream<<"0 0 moveto\n";
-//         textStream<<width<<" 0 lineto\n";   // horizontal bar
-//         textStream<<width<<" 0 closepath\n";   // horizontal bar
-//         textStream<<"0 0 moveto\n";
-//         textStream<<0<<" "<<height<<" lineto\n";   // veritcal bar
-//         textStream<<0<<" "<<height<<" closepath\n";   // veritcal bar
-//
-//         double offset = 5;
-//         for (int i=0; i<(int)edges.size(); i+=2)
-//         {
-//             double x0 = (offset+(Vuv(edges[i], 0)-minx)*cm2pxw);
-//             double x1 = (offset+(Vuv(edges[i+1], 0)-minx)*cm2pxw);
-//             double y0 = (offset+(Vuv(edges[i], 1)-miny)*cm2pxh);
-//             double y1 = (offset+(Vuv(edges[i+1], 1)-miny)*cm2pxh);
-//             textStream<<x0<<" "<<y0<<" moveto\n";
-//             textStream<<x1<<" "<<y1<<" lineto\n";
-//             textStream<<x1<<" "<<y1<<" closepath\n";;
-//         }
-//         textStream<<"0 setlinewidth stroke\n";
-//         textStream<<"showpage\n";
-//     }
-//
-//   // viewer.core.background_color(0) = 1.;
-//   // viewer.core.background_color(1) = 1.;
-//   // viewer.core.background_color(2) = 1.;
-//   // viewer.core.show_lines = init_show_wireframe;
-//   // viewer.core.show_overlay_depth = false;
-//   // viewer.launch();
-// }
-//
-//
+int main(int argc, char* argv[])
+{
+    std::string outfile = "test.ps";
+    if (argc < 6)
+    {
+        std::cout << "Use: " << argv[0] << " circumference1 curcumference2 height cut_angle outputfile " << std::endl;
+        std::cout << "     -equidistant -- test this flag" << std::endl;
+        std::cout << "     NOTE: all units are centimeters, cut angle is in degrees" << std::endl;
+    }
+    else
+    {
+        r1 = atof(argv[1]) / (2 * M_PI);
+        r2 = atof(argv[2]) / (2 * M_PI);
+        h = atof(argv[3]);
+        cut_angle = atof(argv[4]) / 180 * M_PI;
+        outfile = argv[5];
+
+        for (int i = 6; i < argc; i++)
+        {
+            if (strcmp(argv[i], "-equidistant"))
+                equidistant = true;
+            else
+                std::cout << "[WARNING] Unknown command: " << argv[i] << std::endl;
+        }
+    }
+    std::vector<int> edges, corrs;
+
+    std::cout << "r1: " << r1 << std::endl;
+    std::cout << "r2: " << r2 << std::endl;
+    std::cout << "h: " << h << std::endl;
+    std::cout << "cut_angle: " << cut_angle << std::endl;
+    std::cout << "equidistant: " << equidistant << std::endl;
+    std::cout << "outfile: " << outfile << std::endl;
+
+    CreateCylinderWithCut(r1, r2, h, V, F, P, cir_res, cut_angle, equidistant, edges, corrs);
+    UnwarpCylinder(V, F, Vuv);
+
+    int width = 595; //210;
+    int height = 842; //297;
+    double cm2pxw = 10 * width / 210.;
+    double cm2pxh = 10 * height / 297.;
+    double minx = Vuv.col(0).minCoeff();
+    double maxx = Vuv.col(0).maxCoeff();
+    double miny = Vuv.col(1).minCoeff();
+    double maxy = Vuv.col(1).maxCoeff();
+
+    if (maxx - minx >= width || maxy - miny >= height)
+    {
+        std::cout << "[ERROR] Cannot fit " << (maxx - minx) << "x" << (maxy - miny) << " cutout ";
+        std::cout << " on " << width << "x" << height << " paper " << std::endl;
+    }
+    else
+    {
+        std::ofstream textStream(outfile.c_str());
+        textStream << "0 0 moveto\n";
+        textStream << width << " 0 lineto\n"; // horizontal bar
+        textStream << width << " 0 closepath\n"; // horizontal bar
+        textStream << "0 0 moveto\n";
+        textStream << 0 << " " << height << " lineto\n"; // veritcal bar
+        textStream << 0 << " " << height << " closepath\n"; // veritcal bar
+
+        double offset = 5;
+        for (int i = 0; i < (int)edges.size(); i += 2)
+        {
+            double x0 = (offset + (Vuv(edges[i], 0) - minx) * cm2pxw);
+            double x1 = (offset + (Vuv(edges[i + 1], 0) - minx) * cm2pxw);
+            double y0 = (offset + (Vuv(edges[i], 1) - miny) * cm2pxh);
+            double y1 = (offset + (Vuv(edges[i + 1], 1) - miny) * cm2pxh);
+            textStream << x0 << " " << y0 << " moveto\n";
+            textStream << x1 << " " << y1 << " lineto\n";
+            textStream << x1 << " " << y1 << " closepath\n";;
+        }
+        textStream << "0 setlinewidth stroke\n";
+        textStream << "showpage\n";
+    }
+}
+
