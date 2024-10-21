@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 // Components
 import { Input } from '@/components/ui/input';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { PasswordInput } from '@/components/ui/password-input';
 import {
   Form,
@@ -25,27 +25,26 @@ import FacebookIcon from '@/assets/svg/facebook.svg';
 import GoogleIcon from '@/assets/svg/google.svg';
 
 // Types and Schema
-import { SignUpSchema, signUpSchema } from '../schema/auth.schema';
+import { SignInSchema, signInSchema } from '../schema/auth.schema';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '@/router/routes';
 
-type SignUpFormProps = React.HTMLAttributes<HTMLDivElement>;
+type SignInFormProps = React.HTMLAttributes<HTMLDivElement>;
 
-export const SignUpForm = ({ className }: SignUpFormProps) => {
+export const SignInForm = ({ className }: SignInFormProps) => {
   const [isLoading] = React.useState<boolean>(false);
 
   // 1. Define your form.
-  const form = useForm<SignUpSchema>({
-    resolver: zodResolver(signUpSchema),
+  const form = useForm<SignInSchema>({
+    resolver: zodResolver(signInSchema),
     defaultValues: {
-      name: '',
       email: '',
       password: '',
     },
   });
 
   // 2. Define a submit handler.
-  const onSubmit = async (values: SignUpSchema) => {
+  const onSubmit = async (values: SignInSchema) => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
@@ -61,27 +60,14 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
     >
       <div className="flex w-full flex-col justify-center space-y-3 sm:w-[350px]">
         <div className="flex flex-col space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Welcome Back!</h1>
           <p className="text-sm text-muted-foreground">
-            Enter your information to create an account.
+            Login to your account to continue using Xyra Spiral Flow.
           </p>
         </div>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your name..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name="email"
@@ -116,7 +102,7 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
           <div className="pt-2">
             <Button disabled={isLoading} className="w-full">
               {isLoading && <LucideCircle className="mr-2 h-4 w-4 animate-spin" />}
-              Sign Up
+              Sign In
             </Button>
           </div>
         </form>
@@ -143,31 +129,15 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
           Apple
         </Button>
       </div>
-
-      <p className="text-sm text-muted-foreground">
-        By clicking sign up, you agree to our{' '}
-        <Link to="/terms" className="underline underline-offset-4 hover:text-primary">
-          Terms of Service
-        </Link>{' '}
-        and{' '}
-        <Link to="/privacy" className="underline underline-offset-4 hover:text-primary">
-          Privacy Policy
-        </Link>
-        .
-      </p>
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
       </div>
-      <Link
-        to={AppRoutes.AUTH.LOGIN}
-        className={cn(
-          buttonVariants({ variant: 'link' }),
-          'w-full text-center underline underline-offset-4',
-        )}
-      >
-        Already have an account? Sign in
+      <Link to={AppRoutes.AUTH.REGISTER}>
+        <Button variant="link" type="button" disabled={isLoading} className="w-full underline">
+          Don't have an account? Create one now!
+        </Button>
       </Link>
     </motion.div>
   );

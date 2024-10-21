@@ -1,9 +1,7 @@
-import { Link } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 // Components
 import { cn } from '@/lib/utils';
-import { buttonVariants } from '@/components/ui/button';
-import { SignUpForm } from './signup-form';
 import { GridPattern } from '@/components/patterns/grid-pattern';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -60,33 +58,15 @@ export default function AuthenticationPage() {
           ]}
           className={cn(
             '[mask-image:radial-gradient(100vw_circle_at_center,white,transparent)]',
-            'inset-x-0 inset-y-[-30%] z-[-1] h-[100vh] skew-y-12 opacity-70',
+            'fixed inset-x-0 inset-y-[-30%] -right-1/2 -top-1/2 z-[-1] h-[200vh] skew-y-12 opacity-80',
           )}
         />
-        <div className="w-8/12 space-y-3">
+        <div className="min-h-full w-8/12 space-y-3">
           <Card className="flex w-full items-center justify-center">
-            <CardContent className="w-max py-10">
-              <div className="mx-auto flex w-full flex-col justify-center space-y-3 sm:w-[350px]">
-                <div className="flex flex-col space-y-1">
-                  <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
-                  <p className="text-sm text-muted-foreground">
-                    Enter your information to create an account.
-                  </p>
-                </div>
-                <SignUpForm />
-              </div>
+            <CardContent className="w-max overflow-clip px-10 py-10">
+              <Outlet />
             </CardContent>
           </Card>
-
-          <Link
-            to="#"
-            className={cn(
-              buttonVariants({ variant: 'link' }),
-              'w-full text-center underline underline-offset-4 md:right-8 md:top-8',
-            )}
-          >
-            Already have an account? Sign in
-          </Link>
         </div>
       </div>
     </main>
