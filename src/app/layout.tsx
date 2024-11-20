@@ -1,18 +1,19 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import './globals.css';
 
-import { Onest } from 'next/font/google'
- 
+import { Onest } from 'next/font/google';
+
 // If loading a variable font, you don't need to specify the font weight
-const onest = Onest({ subsets: ['latin'],
+const onest = Onest({
+  subsets: ['latin'],
   adjustFontFallback: true,
   preload: true,
   display: 'swap',
- })
+});
 
 export const metadata: Metadata = {
-  title: "Spiral Flow",
-  description: "",
+  title: 'Spiral Flow',
+  description: '',
 };
 
 export default function RootLayout({
@@ -22,11 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${onest.className} antialiased dark`}
-      >
-        {children}
-      </body>
+      <body className={`${onest.className} dark h-screen w-screen antialiased`}>{children}</body>
     </html>
   );
 }
