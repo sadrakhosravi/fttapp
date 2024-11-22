@@ -10,7 +10,7 @@ export const Preview = () => {
       <CardContent className="h-full p-4 pt-4">
         <Tabs defaultValue="account" className="w-full">
           <TabsList>
-            <TabsTrigger className="font-semibold" value="account">
+            <TabsTrigger className="font-semibold" value="page-view">
               Page View
             </TabsTrigger>
             <TabsTrigger
@@ -22,7 +22,7 @@ export const Preview = () => {
               3D View
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="account">Make changes to your account here.</TabsContent>
+          <TabsContent value="page-view">Page View</TabsContent>
         </Tabs>
       </CardContent>
     </Card>

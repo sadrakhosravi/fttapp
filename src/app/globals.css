@@ -67,6 +67,14 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background font-medium text-foreground;
+    @apply bg-background text-sm font-medium text-foreground;
+  }
+  h3 {
+    @apply text-base;
+  }
+
+  .text-sm {
+    font-size: 0.813rem /* 13px */;
+    line-height: 1.25rem /* 20px */;
   }
 }
