@@ -6,12 +6,25 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 // Components
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
-import { Separator } from '../ui/separator';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 
 // Schemas
-import { pageControlsSchema } from './page-controls/page-controls-schema';
+import { pageControlsSchema } from '../schemas/page-controls-schema';
 
 export const PageControls = () => {
   const form = useForm<z.infer<typeof pageControlsSchema>>({

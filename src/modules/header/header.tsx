@@ -3,9 +3,14 @@ import Image from 'next/image';
 
 // Logo
 import Logo from '../../../public/spiralflow-logo-white.svg';
-import { Button } from '../ui/button';
+import { Button } from '../../components/ui/button';
 import { Download, Printer, Share2 } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../components/ui/tooltip';
 
 export const Header = () => {
   return (

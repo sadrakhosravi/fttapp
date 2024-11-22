@@ -1,8 +1,8 @@
 // Components
-import { Header } from '@/components/header/header';
-import { Preview } from '@/components/preview/preview';
-import { ParameterControls } from '@/components/controls/parameter-controls';
-import { PageControls } from '@/components/controls/page-controls';
+import { Header } from '@/modules/header/header';
+import { Preview } from '@/modules/preview/components/preview';
+import { ParameterControls } from '@/modules/controls/components/parameter-controls';
+import { PageControls } from '@/modules/controls/components/page-controls';
 
 export default function Home() {
   return (

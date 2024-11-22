@@ -7,14 +7,21 @@ import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 
 // Components
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
-import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
-import { Separator } from '../ui/separator';
-import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 // Schemas
-import { parameterFormSchema } from './parameter-controls/parameter-schema';
+import { parameterFormSchema } from '../schemas/parameter-schema';
 
 export const ParameterControls = () => {
   const form = useForm<z.infer<typeof parameterFormSchema>>({
