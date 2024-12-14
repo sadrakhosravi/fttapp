@@ -26,7 +26,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${onest.className} dark h-screen w-screen antialiased`}>
         {children}
-
         <Toaster />
       </body>
     </html>

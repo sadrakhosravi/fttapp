@@ -1,4 +1,6 @@
-import jsPDF from 'jspdf';
+'use client';
+
+import * as jsPDF from 'jspdf';
 
 // Types
 import type { Matrix } from '@/algorithm/ThroatUnwrap';
@@ -38,7 +40,7 @@ export const createPDF = (
   }
 
   // Create a new PDF document
-  const doc = new jsPDF({
+  const doc = new jsPDF.jsPDF({
     orientation: 'portrait',
     unit: 'mm',
     format: pageSize,

@@ -6,7 +6,13 @@ import { throatUnwrap$ } from '../store/store';
 import { createPDF } from '../pdf/createPDF';
 
 export const PrintFileButton = () => {
-  const handlePrintButtonClick = async () => {
+  const handlePrintButtonClick = () => {
+    // Ensure this code runs only in the browser
+    if (typeof window === 'undefined') {
+      console.error('This function must run in a browser environment.');
+      return;
+    }
+
     const throatUnwrap = throatUnwrap$.get();
 
     if (!throatUnwrap) {

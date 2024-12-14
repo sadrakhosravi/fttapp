@@ -3,6 +3,7 @@ import { Header } from '@/modules/header/header';
 import { Preview } from '@/modules/preview/components/preview';
 import { ParameterControls } from '@/modules/controls/components/parameter-controls';
 import { PageControls } from '@/modules/controls/components/page-controls';
+import { Suspense } from 'react';
 
 export default function Home() {
   return (
@@ -12,7 +13,9 @@ export default function Home() {
         <div className="h-full pt-2">
           <ParameterControls />
         </div>
-        <Preview />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Preview />
+        </Suspense>
         <div className="h-full pt-2">
           <PageControls />
         </div>
