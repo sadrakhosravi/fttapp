@@ -36,7 +36,8 @@ if (typeof window !== 'undefined') {
     }
   });
 
-  paramStore$.cir_res.set(searchParams.get('cir_res') as keyof typeof cir_res_map);
+  if (searchParams.has('cir_res'))
+    paramStore$.cir_res.set(searchParams.get('cir_res') as keyof typeof cir_res_map);
 
   // Initialize URL query parameters based on the store
   setQueryParams();
@@ -45,7 +46,7 @@ if (typeof window !== 'undefined') {
   paramStore$.onChange((store) => {
     const params = new URLSearchParams(window.location.search);
     Object.entries(store.value).forEach(([key, value]) => {
-      params.set(key, value.toString());
+      params.set(key, value?.toString());
     });
     window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
   });
@@ -68,7 +69,7 @@ function setQueryParams() {
   const params = new URLSearchParams(window.location.search);
   const store = paramStore$.get();
   Object.entries(store).forEach(([key, value]) => {
-    params.set(key, value.toString());
+    params.set(key, value?.toString());
   });
   window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
 }
