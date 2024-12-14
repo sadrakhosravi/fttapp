@@ -1,0 +1,75 @@
+'use client';
+
+import { z } from 'zod';
+import { observable } from '@legendapp/state';
+
+import type { pageControlsSchema } from '../controls/schemas/page-controls-schema';
+import type { cir_res_map, parameterFormSchema } from '../controls/schemas/parameter-schema';
+import { ThroatUnwrap } from '@/algorithm/ThroatUnwrap';
+
+type Store = z.infer<typeof pageControlsSchema> & z.infer<typeof parameterFormSchema> & {};
+
+export const paramStore$ = observable<Store>({
+  r1: 0,
+  r2: 0,
+  h: 0,
+  cir_res: 'medium',
+  cut_angle: 30,
+  equidistant: 'no',
+  size: 'A4',
+  orientation: 'Portrait',
+  margins: 'Normal',
+});
+
+export const throatUnwrap$ = observable<ThroatUnwrap | null>(null);
+
+const searchParams = new URLSearchParams(window.location.search);
+searchParams.forEach((value, key) => {
+  if (paramStore$.hasOwnProperty(key)) {
+    const parsedValue = parseValue(value, paramStore$[key as keyof typeof paramStore$]);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    paramStore$[key as keyof typeof paramStore$].set(parsedValue);
+  }
+
+  paramStore$.cir_res.set(searchParams.get('cir_res') as keyof typeof cir_res_map);
+});
+
+setTimeout(() => {
+  // Initialize from URL parameters
+  if (typeof window !== 'undefined') {
+    // Set URL query params based on the store
+    setQueryParams();
+
+    // Update URL query params on store change
+    paramStore$.onChange((store) => {
+      const params = new URLSearchParams(window.location.search);
+      Object.entries(store.value).forEach(([key, value]) => {
+        params.set(key, value.toString());
+      });
+      window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+    });
+  }
+}, 300);
+
+/**
+ * Helper function to parse values based on the existing type
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseValue(value: string, currentValue: any) {
+  if (typeof currentValue === 'number') return parseFloat(value);
+  if (typeof currentValue === 'boolean') return value === 'true';
+  return value;
+}
+
+/**
+ * Helper function that sets the URL query params based on the store
+ */
+function setQueryParams() {
+  const params = new URLSearchParams(window.location.search);
+  const store = paramStore$.get();
+  Object.entries(store).forEach(([key, value]) => {
+    params.set(key, value.toString());
+  });
+  window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+}

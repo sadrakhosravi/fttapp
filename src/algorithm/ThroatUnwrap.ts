@@ -1,48 +1,76 @@
+'use client';
+
 // Define Vector3d as a tuple type
-type Vector3d = [number, number, number];
+export type Vector3d = [number, number, number];
 
 // Define Matrix as an array of Vector3d
-type Matrix = Vector3d[];
+export type Matrix = Vector3d[];
 
-type Faces = [number, number, number][];
+export type Faces = [number, number, number][];
 
 export class ThroatUnwrap {
   private _r1: number;
   private _r2: number;
   private _h: number;
   private _cutAngle: number;
-  private _circle_res: number;
+  private _circleResolution: number;
   private _equidistant: boolean;
-  private _cylinderWithCut: [Matrix, Faces, Matrix, number[], number[]];
+  private _V: Matrix;
+  private _F: Faces;
   private _unwrappedCylinder: Matrix;
-
+  private _edges: number[];
+  private _cylinder: [Matrix, Faces, Matrix, number[], number[]];
   constructor(
     r1: number,
     r2: number,
     h: number,
     cutAngle: number,
-    circle_res: number,
+    circleResolution: number,
     equidistant: boolean,
   ) {
     this._r1 = r1 / (2 * Math.PI);
     this._r2 = r2 / (2 * Math.PI);
     this._h = h;
     this._cutAngle = (cutAngle / 180) * Math.PI;
-    this._circle_res = circle_res;
+    this._circleResolution = circleResolution;
     this._equidistant = equidistant;
 
-    this._cylinderWithCut = this.createCylinderWithCut(
-      r1,
-      r2,
-      h,
-      circle_res,
-      cutAngle,
-      equidistant,
+    // Ensure h is positive
+    if (h <= 0) {
+      throw new Error("Parameter 'h' must be greater than 0.");
+    }
+
+    // Ensure circleResolution is positive
+    if (circleResolution <= 0) {
+      throw new Error("Parameter 'circleResolution' must be greater than 0.");
+    }
+
+    // Ensure cutAngle is not zero and within a valid range
+    if (cutAngle <= 0 || cutAngle >= 180) {
+      throw new Error("Parameter 'cutAngle' must be between 0 and 180 degrees (exclusive).");
+    }
+
+    // If not equidistant, ensure r2 != r1 to allow meaningful spiral growth
+    if (!equidistant && r1 === r2) {
+      throw new Error("When 'equidistant' is false, 'r1' must not equal 'r2'.");
+    }
+
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    const [V, F, _, edges] = this.createCylinderWithCut(
+      this._r1,
+      this._r2,
+      this._h,
+      this._circleResolution,
+      this._cutAngle,
+      this._equidistant,
     );
-    this._unwrappedCylinder = this.unwarpCylinder(
-      this._cylinderWithCut[0],
-      this._cylinderWithCut[1],
-    );
+    const unwrappedCylinder = this.unwarpCylinder(V, F);
+
+    this._cylinder = [V, F, _, edges, []];
+    this._V = V;
+    this._F = F;
+    this._edges = edges;
+    this._unwrappedCylinder = unwrappedCylinder;
   }
 
   public get r1(): number {
@@ -62,18 +90,26 @@ export class ThroatUnwrap {
   }
 
   public get circle_res(): number {
-    return this._circle_res;
+    return this._circleResolution;
   }
 
   public get equidistant(): boolean {
     return this._equidistant;
   }
 
-  public get cylinder(): [Matrix, Faces, Matrix, number[], number[]] {
-    return this._cylinderWithCut;
+  public get unwrapped(): Matrix {
+    return this._unwrappedCylinder;
   }
 
-  public get unwrapped(): Matrix {
+  public get edges(): number[] {
+    return this._edges;
+  }
+
+  public get cylinder(): [Matrix, Faces, Matrix, number[], number[]] {
+    return this._cylinder;
+  }
+
+  public get unwrappedCylinder(): Matrix {
     return this._unwrappedCylinder;
   }
 
@@ -86,35 +122,37 @@ export class ThroatUnwrap {
    * @param circle_res
    * @param equidistant
    */
-  public updateParameters(
+  public updateParameters = (
     r1: number,
     r2: number,
     h: number,
     cutAngle: number,
-    circle_res: number,
+    circleResolution: number,
     equidistant: boolean,
-  ): void {
+  ): void => {
     this._r1 = r1 / (2 * Math.PI);
     this._r2 = r2 / (2 * Math.PI);
     this._h = h;
     this._cutAngle = (cutAngle / 180) * Math.PI;
-    this._circle_res = circle_res;
+    this._circleResolution = circleResolution;
     this._equidistant = equidistant;
 
-    this._cylinderWithCut = this.createCylinderWithCut(
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    const [V, F, _, edges] = this.createCylinderWithCut(
       this._r1,
       this._r2,
       this._h,
-      this._circle_res,
+      circleResolution,
       this._cutAngle,
-      this._equidistant,
+      false,
     );
+    const unwrappedCylinder = this.unwarpCylinder(V, F);
 
-    this._unwrappedCylinder = this.unwarpCylinder(
-      this._cylinderWithCut[0],
-      this._cylinderWithCut[1],
-    );
-  }
+    this._V = V;
+    this._F = F;
+    this._edges = edges;
+    this._unwrappedCylinder = unwrappedCylinder;
+  };
 
   /**
    * Generates a cylinder mesh with a cut applied at an angle.
@@ -159,11 +197,13 @@ export class ThroatUnwrap {
       const epsilonH = h / 100;
       let maxiter = 1000000;
 
+      const sampleOnSpiral = this.sampleOnSpiral;
+
       while ((lastId < 0 || id < lastId) && maxiter > 0) {
         maxiter--;
 
         // Sample p1
-        const [p1, ch] = this.sampleOnSpiral(r1, r2, h, cutAngle, theta, equidistant);
+        const [p1, ch] = sampleOnSpiral(r1, r2, h, cutAngle, theta, equidistant);
 
         if (theta >= 0 && ch < h) {
           pnts.push([...p1]); // Store a copy of p1 in pnts
@@ -179,7 +219,7 @@ export class ThroatUnwrap {
         }
 
         // Sample p3
-        const [p3] = this.sampleOnSpiral(r1, r2, h, cutAngle, theta + 2 * Math.PI, equidistant);
+        const [p3] = sampleOnSpiral(r1, r2, h, cutAngle, theta + 2 * Math.PI, equidistant);
 
         // Adjust p3[1]
         p3[1] -= epsilonH;
@@ -214,14 +254,6 @@ export class ThroatUnwrap {
    * @returns A 2D matrix of unwrapped vertices
    */
   public unwarpCylinder(V: Matrix, F: Faces): Matrix {
-    const normalize = this.normalize;
-    const subtract = this.subtract;
-    const cross = this.cross;
-    const norm = this.norm;
-    const dot = this.dot;
-    const add = this.add;
-    const scale = this.scale;
-
     const Vuv: Matrix = Array(V.length).fill([0, 0, 0]);
     const flattened: boolean[] = Array(V.length).fill(false);
 
@@ -368,77 +400,39 @@ export class ThroatUnwrap {
 
     return [[Math.sin(theta) * cr, ch, Math.cos(theta) * cr], ch, cr];
   }
+}
 
-  /**
-   * Calculates the cross product of two vectors.
-   * @param v1 - First vector
-   * @param v2 - Second vector
-   * @returns The cross product of the two vectors
-   */
-  private cross(v1: Vector3d, v2: Vector3d): Vector3d {
-    return [
-      v1[1] * v2[2] - v1[2] * v2[1],
-      v1[0] * v2[2] - v1[2] * v2[0],
-      v1[0] * v2[1] - v1[1] * v2[0],
-    ];
-  }
+// Cross product function
+function cross(v1: Vector3d, v2: Vector3d): Vector3d {
+  return [
+    v1[1] * v2[2] - v1[2] * v2[1],
+    v1[0] * v2[2] - v1[2] * v2[0],
+    v1[0] * v2[1] - v1[1] * v2[0],
+  ];
+}
 
-  /**
-   * Subtracts one vector from another.
-   * @param v1 - The vector to subtract from
-   * @param v2 - The vector to subtract
-   * @returns The result of the subtraction
-   */
-  private subtract(v1: Vector3d, v2: Vector3d): Vector3d {
-    return [v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2]];
-  }
+// Helper functions
+function subtract(v1: Vector3d, v2: Vector3d): Vector3d {
+  return [v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2]];
+}
 
-  /**
-   * Adds two vectors.
-   * @param v1 - The first vector
-   * @param v2 - The second vector
-   * @returns The result of the addition
-   */
-  private add(v1: Vector3d, v2: Vector3d): Vector3d {
-    return [v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]];
-  }
+function add(v1: Vector3d, v2: Vector3d): Vector3d {
+  return [v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]];
+}
 
-  /**
-   * Scales a vector by a scalar.
-   * @param v - The vector to scale
-   * @param s - The scalar to scale by
-   * @returns The scaled vector
-   */
-  private scale(v: Vector3d, s: number): Vector3d {
-    return [v[0] * s, v[1] * s, v[2] * s];
-  }
+function scale(v: Vector3d, s: number): Vector3d {
+  return [v[0] * s, v[1] * s, v[2] * s];
+}
 
-  /**
-   * Computes the dot product of two vectors.
-   * @param v1 - The first vector
-   * @param v2 - The second vector
-   * @returns The dot product of the two vectors
-   */
-  private dot(v1: Vector3d, v2: Vector3d): number {
-    return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
-  }
+function dot(v1: Vector3d, v2: Vector3d): number {
+  return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
+}
 
-  /**
-   * Computes the norm (magnitude) of a vector.
-   * @param v - The vector to compute the norm of
-   * @returns The norm of the vector
-   */
-  private norm(v: Vector3d): number {
-    return Math.sqrt(this.dot(v, v));
-  }
+function norm(v: Vector3d): number {
+  return Math.sqrt(dot(v, v));
+}
 
-  /**
-   * Normalizes a vector (scales it to have a norm of 1).
-   * @param v - The vector to normalize
-   * @returns The normalized vector
-   */
-  private normalize(v: Vector3d): Vector3d {
-    const n = this.norm(v);
-    return [v[0] / n, v[1] / n, v[2] / n];
-  }
+function normalize(v: Vector3d): Vector3d {
+  const n = norm(v);
+  return [v[0] / n, v[1] / n, v[2] / n];
 }

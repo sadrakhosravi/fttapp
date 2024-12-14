@@ -1,6 +1,6 @@
 import PDFDocument from 'pdfkit';
 import * as fs from 'fs';
-import { createCylinderWithCut, unwarpCylinder } from './ThroatUnwrap'; // Import your functions from their file
+import { ThroatUnwrap } from '../../src/algorithm/ThroatUnwrap';
 
 // Main function
 function main(args: string[]) {
@@ -10,9 +10,6 @@ function main(args: string[]) {
   const cir_res = 100; // Default resolution (you can modify as per requirement)
   console.log(args.unshift('0'));
 
-  console.log(args[4]);
-  console.log(args);
-
   if (args.length < 6) {
     console.log(`Use: ${args[0]} circumference1 circumference2 height cut_angle outputfile`);
     console.log('     -equidistant -- test this flag');
@@ -20,10 +17,10 @@ function main(args: string[]) {
     return;
   } else {
     // Convert arguments to numbers, adjusting for pi
-    r1 = parseFloat(args[1]) / (2 * Math.PI);
-    r2 = parseFloat(args[2]) / (2 * Math.PI);
+    r1 = parseFloat(args[1]);
+    r2 = parseFloat(args[2]);
     h = parseFloat(args[3]);
-    cut_angle = (parseFloat(args[4]) / 180) * Math.PI;
+    cut_angle = parseFloat(args[4]);
     outfile = args[5];
 
     // Parse flags for equidistant or unknown commands
@@ -40,10 +37,12 @@ function main(args: string[]) {
 
   // Call the function to generate cylinder data
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [V, F, _, edges] = createCylinderWithCut(r1, r2, h, cir_res, cut_angle, equidistant);
+  const throatUnwrap = new ThroatUnwrap(r1, r2, h, cut_angle, cir_res, equidistant);
+  const [V, F, _, edges] = throatUnwrap.cylinder;
+  // const [V, F, _, edges] = createCylinderWithCut(r1, r2, h, cir_res, cut_angle, equidistant);
 
   // Unwarp cylinder
-  const Vuv = unwarpCylinder(V, F);
+  const Vuv = throatUnwrap.unwrapped;
 
   const pageWidth = 595; // Original width in pixels
   const pageHeight = 842; // Original height in pixels

@@ -20,32 +20,54 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
+// Store
+import { paramStore$ } from '@/modules/store/store';
+
 // Schemas
 import { parameterFormSchema } from '../schemas/parameter-schema';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { observer } from '@legendapp/state/react';
 
-export const ParameterControls = () => {
+export const ParameterControls = observer(() => {
   const form = useForm<z.infer<typeof parameterFormSchema>>({
     resolver: zodResolver(parameterFormSchema),
-    defaultValues: {
-      r1: 0,
-      r2: 0,
-      h: 0,
-      cir_res: 0,
-      cut_angle: 0,
-      equidistant: false,
+    values: {
+      r1: paramStore$.r1.get(),
+      r2: paramStore$.r2.get(),
+      h: paramStore$.h.get(),
+      cir_res: paramStore$.cir_res.get(),
+      cut_angle: paramStore$.cut_angle.get(),
+      equidistant: paramStore$.equidistant.get(),
     },
   });
 
-  function onSubmit(values: z.infer<typeof parameterFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  // Update store on form change
+  React.useEffect(() => {
+    const subscription = form.watch((values) => {
+      paramStore$.set({
+        ...paramStore$.get(),
+        r1: values.r1!,
+        r2: values.r2!,
+        h: values.h!,
+        cir_res: values.cir_res!,
+        cut_angle: values.cut_angle!,
+        equidistant: values.equidistant!,
+      });
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
-    <aside className="h-full w-80 flex-shrink-0">
+    <aside className="h-full w-[24rem] flex-shrink-0">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+        <form onSubmit={form.handleSubmit(() => {})} className="w-full">
           <h3 className="mb-4 font-semibold">Cylinder Size</h3>
           <div className="w-full space-y-3 pl-6">
             <FormField
@@ -65,7 +87,7 @@ export const ParameterControls = () => {
                     </FormLabel>
                     <div className="w-1/2">
                       <FormControl className="w-full">
-                        <Input className="w-full" placeholder="shadcn" {...field} />
+                        <Input type="number" min={1} max={20} className="w-full" {...field} />
                       </FormControl>
                     </div>
                   </div>
@@ -90,7 +112,7 @@ export const ParameterControls = () => {
                     </FormLabel>{' '}
                     <div className="w-1/2">
                       <FormControl className="w-full">
-                        <Input className="w-full" placeholder="shadcn" {...field} />
+                        <Input type="number" min={1} max={20} className="w-full" {...field} />
                       </FormControl>
                     </div>
                   </div>
@@ -115,7 +137,7 @@ export const ParameterControls = () => {
                     </FormLabel>
                     <div className="w-1/2">
                       <FormControl className="w-full">
-                        <Input className="w-full" placeholder="shadcn" {...field} />
+                        <Input type="number" min={1} max={20} className="w-full" {...field} />
                       </FormControl>
                     </div>
                   </div>
@@ -134,18 +156,24 @@ export const ParameterControls = () => {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between gap-4">
-                    <FormLabel className="flex items-center gap-1">
-                      Cut Angel
-                      <Badge
-                        className="text-xs font-light text-muted-foreground"
-                        variant="secondary"
-                      >
-                        deg
-                      </Badge>
-                    </FormLabel>
+                    <FormLabel>Cut Angle</FormLabel>
                     <div className="w-1/2">
                       <FormControl className="w-full">
-                        <Input className="w-full" placeholder="shadcn" {...field} />
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value.toString()}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="15">15</SelectItem>
+                            <SelectItem value="30">30</SelectItem>
+                            <SelectItem value="45">45</SelectItem>
+                            <SelectItem value="60">60</SelectItem>
+                            <SelectItem value="90">90</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </div>
                   </div>
@@ -159,10 +187,22 @@ export const ParameterControls = () => {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between gap-4">
-                    <FormLabel>Circle Res</FormLabel>
+                    <FormLabel>Circle Resolution</FormLabel>
                     <div className="w-1/2">
                       <FormControl className="w-full">
-                        <Input className="w-full" placeholder="shadcn" {...field} />
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value.toString()}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="low">Low</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="high">High</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </div>
                   </div>
@@ -173,15 +213,20 @@ export const ParameterControls = () => {
             <FormField
               control={form.control}
               name="equidistant"
-              render={({}) => (
+              render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between gap-4">
                     <FormLabel>Equidistant</FormLabel>
                     <div className="w-1/2">
                       <FormControl className="w-full">
-                        <ToggleGroup className="w-full" type="single" defaultValue="a">
-                          <ToggleGroupItem value="a">Yes</ToggleGroupItem>
-                          <ToggleGroupItem value="b">No</ToggleGroupItem>
+                        <ToggleGroup
+                          className="w-full"
+                          type="single"
+                          defaultValue={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <ToggleGroupItem value="yes">Yes</ToggleGroupItem>
+                          <ToggleGroupItem value="no">No</ToggleGroupItem>
                         </ToggleGroup>
 
                         {/* <Input className="w-full" placeholder="shadcn" {...field} /> */}
@@ -208,4 +253,4 @@ export const ParameterControls = () => {
       </div>
     </aside>
   );
-};
+});
