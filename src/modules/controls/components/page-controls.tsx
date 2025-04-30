@@ -29,6 +29,15 @@ import { Separator } from '@/components/ui/separator';
 
 // Schemas
 import { pageControlsSchema } from '../schemas/page-controls-schema';
+import { PageSize } from '@/modules/pdf/constants';
+
+// Page size display names
+const PAGE_SIZE_LABELS: Record<PageSize, string> = {
+  [PageSize.A4]: 'A4',
+  [PageSize.A3]: 'A3',
+  [PageSize.LETTER]: 'Letter',
+  [PageSize.LEGAL]: 'Legal',
+};
 
 export const PageControls = observer(() => {
   const form = useForm<z.infer<typeof pageControlsSchema>>({
@@ -69,12 +78,14 @@ export const PageControls = observer(() => {
                       <FormControl className="w-full">
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <SelectTrigger>
-                            <SelectValue placeholder={field.value} />
+                            <SelectValue
+                              placeholder={PAGE_SIZE_LABELS[field.value as PageSize] || field.value}
+                            />
                           </SelectTrigger>
                           <SelectContent>
                             {pageControlsSchema.shape.size.options.map((option) => (
                               <SelectItem key={option} value={option}>
-                                {option}
+                                {PAGE_SIZE_LABELS[option as PageSize] || option}
                               </SelectItem>
                             ))}
                           </SelectContent>

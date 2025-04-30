@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${onest.className} dark h-screen w-screen antialiased`}>
+      <body className={`${onest.className} dark h-screen w-screen overflow-hidden antialiased`}>
         {children}
         <Toaster />
       </body>

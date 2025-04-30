@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ShapeViewer } from './pdf-viewer';
+import { PageSize } from '@/modules/pdf/constants';
 
 // Algorithm
 import { ThroatUnwrap } from '@/algorithm/ThroatUnwrap';
@@ -25,6 +26,8 @@ export const Preview = () => {
   const par_cir_res = searchParams.get('cir_res');
   const par_cut_angle = searchParams.get('cut_angle');
   const par_equidistant = searchParams.get('equidistant');
+  const par_page_size = searchParams.get('size');
+  const par_orientation = searchParams.get('orientation');
 
   React.useEffect(() => {
     if (!par_r1 || !par_r2 || !par_h || !par_cir_res || !par_cut_angle || !par_equidistant) return;
@@ -61,24 +64,37 @@ export const Preview = () => {
     }
   }, [par_r1, par_r2, par_h, par_cir_res, par_cut_angle, par_equidistant]);
 
+  // Parse the page size or default to A4
+  const pageSize =
+    par_page_size && Object.values(PageSize).includes(par_page_size as PageSize)
+      ? (par_page_size as PageSize)
+      : PageSize.A4;
+
+  // Check if orientation is landscape
+  const isLandscape = par_orientation === 'Landscape';
+
   return (
     <ErrorBoundary>
       <Card className="border-input/80 flex h-full w-full flex-col rounded-2xl rounded-b-none">
         <CardContent className="h-full p-4 pt-4">
-          <Tabs defaultValue="page" className="h-full w-full overflow-hidden">
+          <Tabs defaultValue="page" className="h-full w-full">
             <TabsList>
               <TabsTrigger className="font-semibold" value="page">
                 2D View
               </TabsTrigger>
             </TabsList>
-            <TabsContent className="flex h-full items-start justify-center p-2" value="page">
-              {throatUnwrap && (
-                <ShapeViewer
-                  Vuv={throatUnwrap.unwrappedCylinder}
-                  edges={throatUnwrap.edges}
-                  padding={25.4}
-                />
-              )}
+            <TabsContent className="h-full w-full overflow-x-auto overflow-y-hidden" value="page">
+              <div className="flex w-full max-w-[600px] min-w-full items-start justify-center p-2">
+                {throatUnwrap && (
+                  <ShapeViewer
+                    Vuv={throatUnwrap.unwrappedCylinder}
+                    edges={throatUnwrap.edges}
+                    padding={25.4}
+                    pageSize={pageSize}
+                    isLandscape={isLandscape}
+                  />
+                )}
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>

@@ -7,6 +7,7 @@ import type { pageControlsSchema } from '../controls/schemas/page-controls-schem
 import type { cir_res_map, parameterFormSchema } from '../controls/schemas/parameter-schema';
 import type { ThroatUnwrap } from '@/algorithm/ThroatUnwrap';
 import { cutAngleOptions } from '../controls/data/control-options';
+import { PageSize } from '../pdf/constants';
 
 type Store = z.infer<typeof pageControlsSchema> & z.infer<typeof parameterFormSchema> & {};
 
@@ -17,7 +18,7 @@ export const paramStore$ = observable<Store>({
   cir_res: 'medium',
   cut_angle: parseInt(cutAngleOptions[0].value),
   equidistant: 'no',
-  size: 'A4',
+  size: PageSize.A4,
   orientation: 'Portrait',
   exportType: 'PDF',
 });

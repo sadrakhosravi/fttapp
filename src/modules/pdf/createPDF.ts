@@ -4,12 +4,7 @@ import * as jsPDF from 'jspdf';
 
 // Types
 import type { Matrix } from '@/algorithm/ThroatUnwrap';
-
-interface RGBColor {
-  r: number;
-  g: number;
-  b: number;
-}
+import { PageSize, PAGE_DIMENSIONS, RGBColor } from './constants';
 
 export const createPDF = (
   Vuv: Matrix,
@@ -17,14 +12,25 @@ export const createPDF = (
   color: RGBColor = { r: 0, g: 0, b: 0 }, // default black color
   padding = 25.4 * 2, // 1 inch = 72 points, default 1-inch padding
   strokeThickness = 0.5, // default line thickness in mm
-  pageSize = 'a4',
+  pageSize = PageSize.A4,
+  isLandscape = false, // default to portrait
 ) => {
-  const pageWidth = 595; // A4 width in points
-  const pageHeight = 842; // A4 height in points
+  // Get the dimensions for the selected page size
+  let {
+    pts: [pageWidth, pageHeight],
+    mm: [pageWidthMm, pageHeightMm],
+  } = PAGE_DIMENSIONS[pageSize];
+
+  // Swap dimensions if in landscape mode
+  if (isLandscape) {
+    [pageWidth, pageHeight] = [pageHeight, pageWidth];
+    [pageWidthMm, pageHeightMm] = [pageHeightMm, pageWidthMm];
+  }
+
   const effectiveWidth = pageWidth - 2 * padding;
   const effectiveHeight = pageHeight - 2 * padding;
-  const cm2pxw = (10 * effectiveWidth) / 210;
-  const cm2pxh = (10 * effectiveHeight) / 297;
+  const cm2pxw = (10 * effectiveWidth) / pageWidthMm;
+  const cm2pxh = (10 * effectiveHeight) / pageHeightMm;
 
   // Get the minimum and maximum values in X and Y coordinates
   const minx = Math.min(...Vuv.map((row) => row[0]));
@@ -33,22 +39,21 @@ export const createPDF = (
   const maxy = Math.max(...Vuv.map((row) => row[1]));
 
   if (maxx - minx >= effectiveWidth || maxy - miny >= effectiveHeight) {
-    console.error(
-      `[ERROR] Cannot fit ${maxx - minx}x${maxy - miny} cutout on ${effectiveWidth}x${effectiveHeight} paper`,
+    console.warn(
+      `Shape is larger than the page and will be cut off: ${maxx - minx}x${maxy - miny} cutout on ${effectiveWidth}x${effectiveHeight} paper`,
     );
-    return;
   }
 
-  // Create a new PDF document
+  // Create a new PDF document with the correct page size and orientation
   const doc = new jsPDF.jsPDF({
-    orientation: 'portrait',
+    orientation: isLandscape ? 'landscape' : 'portrait',
     unit: 'mm',
     format: pageSize,
   });
 
   // Calculate conversion from points to mm
-  const pointToMmWidth = 210 / 595;
-  const pointToMmHeight = 297 / 842;
+  const pointToMmWidth = pageWidthMm / pageWidth;
+  const pointToMmHeight = pageHeightMm / pageHeight;
 
   // Set the drawing color and line thickness
   doc.setDrawColor(color.r, color.g, color.b);
