@@ -63,7 +63,7 @@ export const Preview = () => {
 
   return (
     <ErrorBoundary>
-      <Card className="flex h-full w-full flex-col rounded-2xl rounded-b-none border-input/80">
+      <Card className="border-input/80 flex h-full w-full flex-col rounded-2xl rounded-b-none">
         <CardContent className="h-full p-4 pt-4">
           <Tabs defaultValue="page" className="h-full w-full overflow-hidden">
             <TabsList>

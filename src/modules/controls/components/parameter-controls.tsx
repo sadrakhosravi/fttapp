@@ -21,7 +21,7 @@ import { Separator } from '@/components/ui/separator';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 // Store
-import { paramStore$ } from '@/modules/store/store';
+import { paramStore$, setQueryParams } from '@/modules/store/store';
 
 // Schemas
 import { parameterFormSchema } from '../schemas/parameter-schema';
@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { observer } from '@legendapp/state/react';
+import { cutAngleOptions } from '../data/control-options';
 
 export const ParameterControls = observer(() => {
   const form = useForm<z.infer<typeof parameterFormSchema>>({
@@ -61,6 +62,10 @@ export const ParameterControls = observer(() => {
       });
     });
 
+    setTimeout(() => {
+      setQueryParams();
+    }, 100);
+
     return () => subscription.unsubscribe();
   }, []);
 
@@ -79,7 +84,7 @@ export const ParameterControls = observer(() => {
                     <FormLabel className="flex items-center gap-1">
                       Radius 1
                       <Badge
-                        className="text-xs font-light text-muted-foreground"
+                        className="text-muted-foreground text-xs font-light"
                         variant="secondary"
                       >
                         cm
@@ -104,7 +109,7 @@ export const ParameterControls = observer(() => {
                     <FormLabel className="flex items-center gap-1">
                       Radius 2
                       <Badge
-                        className="text-xs font-light text-muted-foreground"
+                        className="text-muted-foreground text-xs font-light"
                         variant="secondary"
                       >
                         cm
@@ -129,7 +134,7 @@ export const ParameterControls = observer(() => {
                     <FormLabel className="flex items-center gap-1">
                       Height
                       <Badge
-                        className="text-xs font-light text-muted-foreground"
+                        className="text-muted-foreground text-xs font-light"
                         variant="secondary"
                       >
                         cm
@@ -167,11 +172,11 @@ export const ParameterControls = observer(() => {
                             <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="15">15</SelectItem>
-                            <SelectItem value="30">30</SelectItem>
-                            <SelectItem value="45">45</SelectItem>
-                            <SelectItem value="60">60</SelectItem>
-                            <SelectItem value="90">90</SelectItem>
+                            {cutAngleOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -241,9 +246,10 @@ export const ParameterControls = observer(() => {
         </form>
       </Form>
 
-      <div className="fixed bottom-4 left-4 w-full text-xs font-light text-muted-foreground">
+      <div className="text-muted-foreground fixed bottom-4 left-4 w-full text-xs font-light">
         Designed and Developed by{' '}
         <Link
+          target="_blank"
           className="border-b border-blue-500 text-blue-500"
           rel="_blank"
           href="https://sadrakhosravi.com"

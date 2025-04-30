@@ -11,10 +11,10 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "experimentalDecorators": true,
-    "jsxFactory": "jsx",
+    "jsxImportSource": "react",
+    "jsx": "preserve",
     "emitDecoratorMetadata": true,
     "isolatedModules": true,
-    "jsx": "preserve",
     "incremental": true,
     "plugins": [
       {

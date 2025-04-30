@@ -6,15 +6,16 @@ import { observable } from '@legendapp/state';
 import type { pageControlsSchema } from '../controls/schemas/page-controls-schema';
 import type { cir_res_map, parameterFormSchema } from '../controls/schemas/parameter-schema';
 import type { ThroatUnwrap } from '@/algorithm/ThroatUnwrap';
+import { cutAngleOptions } from '../controls/data/control-options';
 
 type Store = z.infer<typeof pageControlsSchema> & z.infer<typeof parameterFormSchema> & {};
 
 export const paramStore$ = observable<Store>({
-  r1: 0,
-  r2: 0,
-  h: 0,
+  r1: 8,
+  r2: 9,
+  h: 7,
   cir_res: 'medium',
-  cut_angle: 30,
+  cut_angle: parseInt(cutAngleOptions[0].value),
   equidistant: 'no',
   size: 'A4',
   orientation: 'Portrait',
@@ -65,7 +66,7 @@ function parseValue(value: string, currentValue: any) {
 /**
  * Helper function that sets the URL query params based on the store
  */
-function setQueryParams() {
+export function setQueryParams() {
   const params = new URLSearchParams(window.location.search);
   const store = paramStore$.get();
   Object.entries(store).forEach(([key, value]) => {
