@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ShapeViewer } from './pdf-viewer';
+import { ThreeDViewer } from './three-d-viewer';
 import { PageSize } from '@/modules/pdf/constants';
 
 // Algorithm
@@ -19,6 +20,7 @@ import { throatUnwrap$ } from '@/modules/store/store';
 export const Preview = () => {
   const searchParams = useSearchParams();
   const [throatUnwrap, setThroatUnwrap] = React.useState<null | ThroatUnwrap>();
+  const [activeTab, setActiveTab] = React.useState('page');
 
   const par_r1 = searchParams.get('r1');
   const par_r2 = searchParams.get('r2');
@@ -73,16 +75,26 @@ export const Preview = () => {
   // Check if orientation is landscape
   const isLandscape = par_orientation === 'Landscape';
 
+  // Handle tab change
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
   return (
     <ErrorBoundary>
       <Card className="border-input/80 flex h-full w-full flex-col rounded-2xl rounded-b-none">
         <CardContent className="h-full overflow-x-auto overflow-y-clip p-4 pt-4">
-          <Tabs defaultValue="page" className="h-full w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full w-full">
             <TabsList>
               <TabsTrigger className="font-semibold" value="page">
                 2D View
               </TabsTrigger>
+              <TabsTrigger className="font-semibold" value="3d">
+                3D View (Experimental)
+              </TabsTrigger>
             </TabsList>
+
+            {/* 2D View Tab */}
             <TabsContent className="h-full w-full max-w-[600px] overflow-y-hidden" value="page">
               <div
                 className={`flex items-start ${isLandscape ? 'justify-start overflow-x-auto' : 'justify-center'} p-2`}
@@ -96,6 +108,17 @@ export const Preview = () => {
                     isLandscape={isLandscape}
                   />
                 )}
+              </div>
+            </TabsContent>
+
+            {/* 3D View Tab */}
+            <TabsContent className="h-full w-full overflow-y-hidden" value="3d">
+              <div className="flex flex-col items-center justify-center gap-4 p-2">
+                <ThreeDViewer throatUnwrap={throatUnwrap!} />
+                <div className="w-[500px] p-4 text-center text-xs opacity-60">
+                  Use the mouse to rotate, zoom, and pan the view. Click and drag to rotate, scroll
+                  to zoom, and right-click to pan.
+                </div>
               </div>
             </TabsContent>
           </Tabs>

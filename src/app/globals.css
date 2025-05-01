@@ -193,8 +193,8 @@
 
 /* For Chrome, Safari, and Opera */
 ::-webkit-scrollbar {
-  width: 10px; /* For vertical scrollbar */
-  height: 10px; /* For horizontal scrollbar */
+  width: 8px; /* For vertical scrollbar */
+  height: 8px; /* For horizontal scrollbar */
 }
 
 ::-webkit-scrollbar-track {
