@@ -76,15 +76,17 @@ export const Preview = () => {
   return (
     <ErrorBoundary>
       <Card className="border-input/80 flex h-full w-full flex-col rounded-2xl rounded-b-none">
-        <CardContent className="h-full p-4 pt-4">
+        <CardContent className="h-full overflow-x-auto overflow-y-clip p-4 pt-4">
           <Tabs defaultValue="page" className="h-full w-full">
             <TabsList>
               <TabsTrigger className="font-semibold" value="page">
                 2D View
               </TabsTrigger>
             </TabsList>
-            <TabsContent className="h-full w-full overflow-x-auto overflow-y-hidden" value="page">
-              <div className="flex w-full max-w-[600px] min-w-full items-start justify-center p-2">
+            <TabsContent className="h-full w-full max-w-[600px] overflow-y-hidden" value="page">
+              <div
+                className={`flex items-start ${isLandscape ? 'justify-start overflow-x-auto' : 'justify-center'} p-2`}
+              >
                 {throatUnwrap && (
                   <ShapeViewer
                     Vuv={throatUnwrap.unwrappedCylinder}

@@ -106,8 +106,12 @@ export const ShapeViewer: React.FC<ShapeViewerProps> = ({
 
     // Create or update camera with the current page dimensions
     const camera = cameraRef.current || new THREE.OrthographicCamera(0, 1, 1, 0, 0.1, 1000);
-    camera.left = 0;
-    camera.right = pageWidthMm;
+
+    // When in landscape mode, add a bit of padding to the left to prevent cutting off
+    const cameraLeftOffset = isLandscape ? -5 : 0;
+
+    camera.left = cameraLeftOffset;
+    camera.right = pageWidthMm + (isLandscape ? 5 : 0);
     camera.top = pageHeightMm;
     camera.bottom = 0;
     camera.updateProjectionMatrix();
@@ -160,7 +164,16 @@ export const ShapeViewer: React.FC<ShapeViewerProps> = ({
     const container = mountRef.current;
 
     if (renderer && container && containerSize.width > 0 && containerSize.height > 0) {
-      renderer.setSize(containerSize.width, containerSize.height);
+      // Add extra padding to the renderer width in landscape mode to prevent cutting off
+      const extraWidth = isLandscape ? 10 : 0;
+      renderer.setSize(containerSize.width + extraWidth, containerSize.height);
+
+      // Adjust the renderer's viewport offset if needed in landscape mode
+      if (isLandscape) {
+        renderer.setViewport(5, 0, containerSize.width, containerSize.height);
+      } else {
+        renderer.setViewport(0, 0, containerSize.width, containerSize.height);
+      }
 
       // Force a render after resize
       if (sceneRef.current && cameraRef.current) {
@@ -266,11 +279,13 @@ export const ShapeViewer: React.FC<ShapeViewerProps> = ({
   return (
     <div
       ref={mountRef}
-      className="relative overflow-clip rounded-md border border-white/25"
+      className={`relative overflow-clip rounded-md border border-white/25 ${isLandscape ? 'ml-0' : ''}`}
       style={{
         width: containerSize.width > 0 ? containerSize.width : 'auto',
         height: containerSize.height > 0 ? containerSize.height : '100%',
         minHeight: '200px', // Ensure there's a minimum height during initial render
+        marginLeft: isLandscape ? '0' : 'auto', // Start from left in landscape mode
+        marginRight: 'auto',
       }}
     />
   );
